@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MDS Quarterly Note Generator</title>
+<title>MDS Note Generator</title>
 
 <style>
 body {
@@ -33,6 +33,66 @@ h1 {
     display: grid;
     grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
     gap: 15px;
+}
+
+/* Title row: keep items inline and prevent wrapping */
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: nowrap;
+}
+.title-row h1 {
+    margin: 0;
+    color: #0078d4;
+    font-size: 1.75rem;
+    white-space: nowrap;
+}
+.title-row .note-generator {
+    font-size: 1.75rem;
+    color: #0078d4;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.title-row select#noteType {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: white;
+    width: auto; /* don't stretch to full width */
+    min-width: max-content; /* fit longest option */
+    white-space: nowrap;
+}
+
+/* Toast notifications */
+.toast {
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    margin-top: 8px;
+    opacity: 1;
+    transition: opacity 300ms ease, transform 300ms ease;
+}
+.toast.hide { opacity: 0; transform: translateY(8px); }
+
+/* Centered toast container */
+#toastContainer {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none; /* allow clicks through except on toast */
+}
+#toastContainer .toast {
+    pointer-events: auto; /* to allow interactions with the toast itself */
+    min-width: 220px;
+    text-align: center;
 }
 
 label {
@@ -70,11 +130,13 @@ button {
 
 textarea {
     width: 100%;
-    height: 500px;
+    min-height: 200px; /* default minimum */
+    height: auto; /* allow JS to resize */
     border: 1px solid #ccc;
     padding: 10px;
     font-family: Consolas, monospace;
     box-sizing: border-box;
+    overflow: hidden; /* hide internal scrollbars when resized */
 }
 
 @media print {
@@ -89,7 +151,17 @@ textarea {
 
 <div class="container">
 
-<h1>MDS Quarterly Note Generator</h1>
+<div class="title-row">
+    <h1>MDS</h1>
+    <select id="noteType">
+        <option></option>
+        <option>Admission</option>
+        <option>Quarterly</option>
+        <option>Annual</option>
+        <option>Significant Changes</option>
+    </select>
+    <div class="note-generator">Note Generator</div>
+</div>
 
 <div class="card">
 
@@ -205,6 +277,9 @@ textarea {
 <textarea id="output"></textarea>
 </div>
 
+<!-- Toast container for non-blocking messages -->
+<div id="toastContainer" aria-live="polite"></div>
+
 </div>
 
 <script>
@@ -221,6 +296,7 @@ function generateNote() {
         ardDisplay = (ardDate.getMonth() + 1) + "/" + ardDate.getDate() + "/" + yy;
     }
     var dpoa = document.getElementById("dpoa").value;
+    var noteType = document.getElementById("noteType").value;
 
     var orientation = document.getElementById("orientation").value;
     var phq = document.getElementById("phq").value;
@@ -230,7 +306,7 @@ function generateNote() {
 
     var note = "";
 
-    note += "MDS QUARTERLY NOTE\n\n";
+    note += "MDS " + noteType + " NOTE\n\n";
 
     note += "ARD:\n";
     note += ardDisplay + "\n\n";
@@ -264,7 +340,11 @@ function generateNote() {
     note += "POLST code status is " + polst + ". ";
     note += "DPOA specifies decision maker is " + dpoa + ".";
 
-    document.getElementById("output").value = note;
+    var outputEl = document.getElementById("output");
+    outputEl.value = note;
+    // Auto-resize textarea to fit content
+    outputEl.style.height = 'auto';
+    outputEl.style.height = outputEl.scrollHeight + 'px';
 }
 
 function copyNote() {
@@ -272,19 +352,40 @@ function copyNote() {
     var output = document.getElementById("output");
 
     if (output.value.trim() === "") {
-        alert("Generate a note first.");
+        showToast("Generate a note first.", 3000);
         return;
     }
 
     navigator.clipboard.writeText(output.value)
         .then(function() {
-            alert("Note copied to clipboard.");
+            showToast("Note copied to clipboard.", 3000);
         })
         .catch(function() {
             output.select();
             document.execCommand("copy");
-            alert("Note copied to clipboard.");
+            showToast("Note copied to clipboard.", 3000);
         });
+}
+
+// Toast helper
+function showToast(message, duration) {
+    duration = duration || 3000;
+    var container = document.getElementById('toastContainer');
+    if (!container) return;
+    // Remove any existing toast so only one shows at a time
+    var existing = container.querySelector('.toast');
+    if (existing) {
+        try { container.removeChild(existing); } catch (e) { /* ignore */ }
+    }
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = message;
+    container.appendChild(t);
+    // Auto-dismiss (safely remove only if still attached)
+    setTimeout(function() {
+        t.classList.add('hide');
+        setTimeout(function(){ if (t.parentNode === container) { container.removeChild(t); } }, 350);
+    }, duration);
 }
 
 function clearForm() {
@@ -297,7 +398,9 @@ function clearForm() {
         el.selectedIndex = 0;
     });
 
-    document.getElementById("output").value = "";
+    var outputEl = document.getElementById("output");
+    outputEl.value = "";
+    outputEl.style.height = '';
 }
 
 document.addEventListener("DOMContentLoaded", function() {
