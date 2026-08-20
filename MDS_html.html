@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDS Quarterly Note Generator</title>
+
+<style>
+body {
+    font-family: Segoe UI, Arial, sans-serif;
+    background: #f5f6fa;
+    margin: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #0078d4;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.buttons {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 16px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: white;
+}
+
+#generateBtn { background: #0078d4; }
+#copyBtn { background: #107c10; }
+#clearBtn { background: #d83b01; }
+#printBtn { background: #5c2d91; }
+
+textarea {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-family: Consolas, monospace;
+    box-sizing: border-box;
+}
+
+@media print {
+    .buttons,
+    .card:first-of-type {
+        display: none;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>MDS Quarterly Note Generator</h1>
+
+<div class="card">
+
+<div class="grid">
+
+<div>
+<label>Resident Name</label>
+<input type="text" id="residentName">
+</div>
+
+<div>
+<label>Age</label>
+<input type="number" id="age">
+</div>
+
+<div>
+<label>ARD</label>
+<input type="date" id="ard">
+</div>
+
+<div>
+<label>DPOA</label>
+<input type="text" id="dpoa">
+</div>
+
+<div>
+<label>Orientation</label>
+<select id="orientation">
+<option value=""></option>
+<option>Resident is alert and oriented x4.</option>
+<option>Resident is alert and oriented x3.</option>
+<option>Resident is alert and oriented x2.</option>
+<option>Resident is alert and oriented x1.</option>
+<option>Resident declined to participate in BIMS assessment.</option>
+</select>
+</div>
+
+<div>
+<label>PHQ Result</label>
+<select id="phq">
+<option value=""></option>
+<option>score of 9/27, indicating mild depression.</option>
+<option>score of 10/27, indicating moderate depression.</option>
+<option>score of 11/27, indicating moderate depression.</option>
+<option>score of 12/27, indicating moderate depression.</option>
+<option>score of 13/27, indicating moderate depression.</option>
+<option>score of 14/27, indicating moderate depression.</option>
+<option>score of 15/27, indicating moderately severe depression.</option>
+<option>score of 16/27, indicating moderately severe depression.</option>
+<option>score of 17/27, indicating moderately severe depression.</option>
+<option>score of 18/27, indicating moderately severe depression.</option>
+<option>score of 19/27, indicating moderately severe depression.</option>
+<option>score of 20/27, indicating severe depression.</option>
+<option>score of 21/27, indicating severe depression.</option>
+<option>score of 22/27, indicating severe depression.</option>
+<option>score of 23/27, indicating severe depression.</option>
+<option>score of 24/27, indicating severe depression.</option>
+<option>score of 25/27, indicating severe depression.</option>
+<option>score of 26/27, indicating severe depression.</option>
+<option>score of 27/27, indicating severe depression.</option>
+</select>
+</div>
+
+<div>
+<label>Behavior</label>
+<select id="behavior">
+<option value=""></option>
+<option>Resident's behavior is stable. No physical, verbal or other behaviors noted or reported.</option>
+<option>Resident's behavior is not stable.</option>
+<option>Resident's behavior is stable.</option>
+<option>Occasional verbal agitation noted.</option>
+<option>Requires staff redirection at times.</option>
+<option>No significant behavior concerns.</option>
+</select>
+</div>
+
+<div>
+<label>Care Conference</label>
+<select id="careConference">
+<option value=""></option>
+<option>offered and accepted.</option>
+<option>offered and declined.</option>
+<option>held with family present.</option>
+<option>not conducted this quarter.</option>
+</select>
+</div>
+
+<div>
+<label>POLST</label>
+<select id="polst">
+<option value=""></option>
+<option>FULL CODE / FULL TREATMENT</option>
+<option>FULL CODE / SELECTIVE TREATMENT</option>
+<option>DNR / FULL TREATMENT</option>
+<option>DNR / SELECTIVE TREATMENT</option>
+<option>DNR / COMFORT-FOCUSED TREATMENT</option>
+</select>
+</div>
+
+</div>
+
+<div class="buttons">
+<button type="button" id="generateBtn">Generate Note</button>
+<button id="copyBtn">Copy Note</button>
+<button id="printBtn">Print</button>
+<button id="clearBtn">Clear</button>
+</div>
+
+</div>
+
+<div class="card">
+<h2>Generated Note</h2>
+<textarea id="output"></textarea>
+</div>
+
+</div>
+
+<script>
+
+function generateNote() {
+
+    var name = document.getElementById("residentName").value;
+    var age = document.getElementById("age").value;
+    var ard = document.getElementById("ard").value;
+    var ardDisplay = "";
+    if (ard) {
+        var ardDate = new Date(ard);
+        var yy = String(ardDate.getFullYear()).slice(-2); // last two digits
+        ardDisplay = (ardDate.getMonth() + 1) + "/" + ardDate.getDate() + "/" + yy;
+    }
+    var dpoa = document.getElementById("dpoa").value;
+
+    var orientation = document.getElementById("orientation").value;
+    var phq = document.getElementById("phq").value;
+    var behavior = document.getElementById("behavior").value;
+    var careConference = document.getElementById("careConference").value;
+    var polst = document.getElementById("polst").value;
+
+    var note = "";
+
+    note += "MDS QUARTERLY NOTE\n\n";
+
+    note += "ARD:\n";
+    note += ardDisplay + "\n\n";
+
+    note += "RESIDENT SUMMARY:\n";
+    note += "Resident prefers to be called " + name +
+            ". The resident is " + age +
+            " years old. The following was collected through observation and interaction with the resident, weekly interdisciplinary team reports, and MDS interviews with the resident and staff.\n\n";
+
+    note += "COGNITION:\n";
+    note += orientation + " ";
+    note += "SW will continue to monitor for any changes in cognition and adjust the care plan accordingly.\n\n";
+
+    note += "MOOD:\n";
+    note += "SW completed the PHQ-2 to 9 assessment with " + phq + " ";
+    note += "Staff and SW will continue to monitor mood and emotional well-being as indicated.\n\n";
+
+    note += "BEHAVIOR:\n";
+    note += behavior + " ";
+    note += "Staff will continue to monitor for changes in behavior and response to treatment.\n\n";
+
+    note += "INTERVENTIONS:\n";
+    note += "KGH staff continue to provide encouragement, assistance, and support to promote resident independence, autonomy, and sense of control whenever possible. Additional interventions are outlined in the person-centered care plan and activity notes.\n\n";
+
+    note += "DISCHARGE:\n";
+    note += name + " is appropriate for long-term care placement based on current care needs. ";
+    note += "Care conference " + careConference + "\n\n";
+
+    note += "ADVANCE DIRECTIVES:\n";
+    note += "No changes to advance directives. ";
+    note += "POLST code status is " + polst + ". ";
+    note += "DPOA specifies decision maker is " + dpoa + ".";
+
+    document.getElementById("output").value = note;
+}
+
+function copyNote() {
+
+    var output = document.getElementById("output");
+
+    if (output.value.trim() === "") {
+        alert("Generate a note first.");
+        return;
+    }
+
+    navigator.clipboard.writeText(output.value)
+        .then(function() {
+            alert("Note copied to clipboard.");
+        })
+        .catch(function() {
+            output.select();
+            document.execCommand("copy");
+            alert("Note copied to clipboard.");
+        });
+}
+
+function clearForm() {
+
+    document.querySelectorAll("input").forEach(function(el){
+        el.value = "";
+    });
+
+    document.querySelectorAll("select").forEach(function(el){
+        el.selectedIndex = 0;
+    });
+
+    document.getElementById("output").value = "";
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    document.getElementById("generateBtn")
+        .addEventListener("click", generateNote);
+
+    document.getElementById("copyBtn")
+        .addEventListener("click", copyNote);
+
+    document.getElementById("clearBtn")
+        .addEventListener("click", clearForm);
+
+    document.getElementById("printBtn")
+        .addEventListener("click", function() {
+            window.print();
+        });
+
+});
+
+</script>
+
+</body>
+</html>
