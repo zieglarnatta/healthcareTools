@@ -35,6 +35,11 @@ h1 {
     gap: 15px;
 }
 
+/* allow certain fields to span the full width of the grid */
+.grid .full-row {
+    grid-column: 1 / -1;
+}
+
 /* Title row: keep items inline and prevent wrapping */
 .title-row {
     display: flex;
@@ -199,29 +204,52 @@ textarea {
 </select>
 </div>
 
+<div class="full-row">
+<label>BIMS</label>
+<select id="bims">
+    <option value=""></option>
+    <option>with a score of 1/15. SW proceeded to staff interviews and review of the chart.</option>
+    <option>with a score of 2/15. SW proceeded to staff interviews and review of the chart.</option>
+    <option>with a score of 3/15. SW proceeded to staff interviews and review of the chart.</option>
+    <option>with a score of 4/15. SW proceeded to staff interviews and review of the chart.</option>
+    <option>with a score of 5/15. SW proceeded to staff interviews and review of the chart.</option>
+    <option>with a score of 6/15. SW proceeded to staff interviews and review of the chart.</option>
+    <option>with a score of 7/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 8/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 9/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 10/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 11/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 12/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 13/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 14/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>with a score of 15/15. SW proceeded to PHQ-2 to 9 assessment.</option>
+    <option>resident declined to participate in assessment. SW proceeded to staff interviews.</option>
+</select>
+</div>
+
 <div>
 <label>PHQ Result</label>
 <select id="phq">
 <option value=""></option>
-<option>score of 9/27, indicating mild depression.</option>
-<option>score of 10/27, indicating moderate depression.</option>
-<option>score of 11/27, indicating moderate depression.</option>
-<option>score of 12/27, indicating moderate depression.</option>
-<option>score of 13/27, indicating moderate depression.</option>
-<option>score of 14/27, indicating moderate depression.</option>
-<option>score of 15/27, indicating moderately severe depression.</option>
-<option>score of 16/27, indicating moderately severe depression.</option>
-<option>score of 17/27, indicating moderately severe depression.</option>
-<option>score of 18/27, indicating moderately severe depression.</option>
-<option>score of 19/27, indicating moderately severe depression.</option>
-<option>score of 20/27, indicating severe depression.</option>
-<option>score of 21/27, indicating severe depression.</option>
-<option>score of 22/27, indicating severe depression.</option>
-<option>score of 23/27, indicating severe depression.</option>
-<option>score of 24/27, indicating severe depression.</option>
-<option>score of 25/27, indicating severe depression.</option>
-<option>score of 26/27, indicating severe depression.</option>
-<option>score of 27/27, indicating severe depression.</option>
+<option>9/27, indicating mild depression.</option>
+<option>10/27, indicating moderate depression.</option>
+<option>11/27, indicating moderate depression.</option>
+<option>12/27, indicating moderate depression.</option>
+<option>13/27, indicating moderate depression.</option>
+<option>14/27, indicating moderate depression.</option>
+<option>15/27, indicating moderately severe depression.</option>
+<option>16/27, indicating moderately severe depression.</option>
+<option>17/27, indicating moderately severe depression.</option>
+<option>18/27, indicating moderately severe depression.</option>
+<option>19/27, indicating moderately severe depression.</option>
+<option>20/27, indicating severe depression.</option>
+<option>21/27, indicating severe depression.</option>
+<option>22/27, indicating severe depression.</option>
+<option>23/27, indicating severe depression.</option>
+<option>24/27, indicating severe depression.</option>
+<option>25/27, indicating severe depression.</option>
+<option>26/27, indicating severe depression.</option>
+<option>27/27, indicating severe depression.</option>
 </select>
 </div>
 
@@ -299,6 +327,7 @@ function generateNote() {
     var noteType = document.getElementById("noteType").value;
 
     var orientation = document.getElementById("orientation").value;
+    var bims = document.getElementById("bims").value;
     var phq = document.getElementById("phq").value;
     var behavior = document.getElementById("behavior").value;
     var careConference = document.getElementById("careConference").value;
@@ -318,6 +347,7 @@ function generateNote() {
 
     note += "COGNITION:\n";
     note += orientation + " ";
+    note += "SW approached " + name + " to complete the BIMS assessment, " + bims + " ";
     note += "SW will continue to monitor for any changes in cognition and adjust the care plan accordingly.\n\n";
 
     note += "MOOD:\n";
@@ -365,6 +395,39 @@ function copyNote() {
             document.execCommand("copy");
             showToast("Note copied to clipboard.", 3000);
         });
+}
+
+// Keep BIMS consistent with Orientation selection when appropriate
+function syncBIMSWithOrientation() {
+    var orientationEl = document.getElementById("orientation");
+    var bimsEl = document.getElementById("bims");
+    if (!orientationEl || !bimsEl) return;
+
+    var orientationDeclined = "Resident declined to participate in BIMS assessment.";
+    var bimsDeclinedText = "resident declined to participate in assessment. SW proceeded to staff interviews.";
+
+    // find the declined option in the BIMS select
+    var declinedOptionIndex = Array.from(bimsEl.options).findIndex(function(o){ return o.text === bimsDeclinedText; });
+    var declinedOption = declinedOptionIndex >= 0 ? bimsEl.options[declinedOptionIndex] : null;
+
+    if (orientationEl.value === orientationDeclined) {
+        // when orientation explicitly indicates decline, enable and select only the declined BIMS option
+        if (declinedOption) {
+            declinedOption.disabled = false;
+            bimsEl.selectedIndex = declinedOptionIndex;
+        }
+        bimsEl.disabled = true; // prevent user changes
+    } else {
+        // otherwise, make the declined option unselectable and re-enable the control
+        if (declinedOption) {
+            // disable the declined option so it can't be selected manually
+            declinedOption.disabled = true;
+            // if it was currently selected, clear selection
+            var curr = bimsEl.options[bimsEl.selectedIndex] && bimsEl.options[bimsEl.selectedIndex].text;
+            if (curr === bimsDeclinedText) bimsEl.selectedIndex = 0;
+        }
+        bimsEl.disabled = false;
+    }
 }
 
 // Toast helper
@@ -419,7 +482,54 @@ document.addEventListener("DOMContentLoaded", function() {
             window.print();
         });
 
+    // wire up orientation -> BIMS sync
+    var orientationEl = document.getElementById("orientation");
+    if (orientationEl) {
+        orientationEl.addEventListener("change", syncBIMSWithOrientation);
+        // initial sync on load
+        syncBIMSWithOrientation();
+    }
+
+    // adjust BIMS select to fit longest option
+    if (typeof adjustBIMSWidth === 'function') {
+        adjustBIMSWidth();
+        window.addEventListener('resize', function() {
+            adjustBIMSWidth();
+        });
+    }
+
 });
+
+// Measure longest option text and set the BIMS select width accordingly
+function adjustBIMSWidth() {
+    var bimsEl = document.getElementById('bims');
+    if (!bimsEl) return;
+    var options = Array.from(bimsEl.options).map(function(o){ return o.text; });
+    if (!options.length) return;
+    var longest = options.reduce(function(a,b){ return a.length > b.length ? a : b; });
+
+    var span = document.createElement('span');
+    span.style.visibility = 'hidden';
+    span.style.position = 'absolute';
+    span.style.whiteSpace = 'nowrap';
+    var cs = window.getComputedStyle(bimsEl);
+    span.style.font = cs.font || (cs.fontSize + ' ' + cs.fontFamily);
+    span.textContent = longest;
+    document.body.appendChild(span);
+    var textWidth = span.getBoundingClientRect().width;
+    document.body.removeChild(span);
+
+    // Add extra space for select arrow and padding
+    var extra = 56;
+    var desired = Math.ceil(textWidth + extra);
+
+    // Cap at container width minus some margin
+    var container = document.querySelector('.container');
+    var maxWidth = container ? Math.floor(container.getBoundingClientRect().width - 40) : window.innerWidth - 40;
+    if (desired > maxWidth) desired = maxWidth;
+
+    bimsEl.style.width = desired + 'px';
+}
 
 </script>
 

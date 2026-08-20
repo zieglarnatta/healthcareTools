@@ -18,10 +18,26 @@ A small collection of lightweight HTML + JavaScript utilities to assist with com
 - **ARD (Assessment Reference Date)**: date input. The displayed output uses `MM/DD/YY` formatting (year shown as last two digits).
 - **DPOA**: free-text input for the decision-maker / power of attorney name.
 - **Orientation**: dropdown with prewritten cognition/orientation sentences.
+	- Special behavior: when `Orientation` is set to "Resident declined to participate in BIMS assessment.", the `BIMS` field is automatically set to the declined option and locked (see below).
 - **PHQ Result**: dropdown with PHQ scoring phrase options to describe depressive symptom severity.
 - **Behavior**: dropdown with behavior summary phrases.
 - **Care Conference**: dropdown to note whether a care conference was offered/held/declined.
 - **POLST**: dropdown for code status / POLST entries.
+
+### Orientation ↔ BIMS behavior
+
+- The `Orientation` and `BIMS` fields are linked to prevent inconsistent selections.
+- If `Orientation` is exactly `Resident declined to participate in BIMS assessment.`, the `BIMS` dropdown will be auto-selected to `Resident declined to participate in assessment. SW proceeded to staff interviews.` and the `BIMS` control is temporarily disabled so users cannot change it.
+- In all other cases the specific "declined" option in the `BIMS` dropdown is disabled (not selectable) to avoid mismatched entries; if it was previously selected it will be cleared when `Orientation` changes.
+- The `BIMS` selector is rendered on its own full-width row and is auto-resized at load/resize to display the longest option without truncation.
+
+### How BIMS appears in the generated note
+
+- The generated note always includes the `Orientation` sentence followed immediately by a BIMS sentence in the `COGNITION` section, for example:
+
+	Orientation text
+	SW approached <name> to complete the BIMS assessment, <BIMS selection>
+	SW will continue to monitor for any changes in cognition and adjust the care plan accordingly.
 
 ### Final output
 
