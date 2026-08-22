@@ -57,8 +57,6 @@ The file is available at `MDS_html.html` in the repository root of this folder.
 
 ---
 
-If you'd like, I can also:
+## Usage example
 
-- Turn `MDS_html.html` into a tiny static demo page with a header and example inputs pre-filled.
-- Add a short usage example and screenshot to this `README.md`.
-
+Open `MDS_html.html` in a browser and complete the form, or simply click **Generate Note** after entering values.
