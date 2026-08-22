@@ -174,12 +174,12 @@ textarea {
 
 <div>
 <label>Resident Name</label>
-<input type="text" id="residentName">
+<input type="text" id="residentName" maxlength="30">
 </div>
 
 <div>
 <label>Age</label>
-<input type="number" id="age">
+<input type="number" id="age" min="18" max="110" step="1">
 </div>
 
 <div>
@@ -189,7 +189,7 @@ textarea {
 
 <div>
 <label>DPOA</label>
-<input type="text" id="dpoa">
+<input type="text" id="dpoa" maxlength="30">
 </div>
 
 <div>
@@ -312,14 +312,151 @@ textarea {
 
 <script>
 
+function formatISODate(date) {
+    var y = date.getFullYear();
+    var m = String(date.getMonth() + 1).padStart(2, '0');
+    var d = String(date.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + d;
+}
+
+// Parse a YYYY-MM-DD string into a local Date (avoids UTC-based shift)
+function parseLocalDate(dateString) {
+    if (!dateString) return null;
+    var parts = dateString.split('-');
+    if (parts.length !== 3) return null;
+    var y = Number(parts[0]);
+    var m = Number(parts[1]);
+    var d = Number(parts[2]);
+    return new Date(y, m - 1, d);
+}
+
+function updateGenerateButtonState() {
+    var generateBtn = document.getElementById("generateBtn");
+    var ageEl = document.getElementById("age");
+    var ardEl = document.getElementById("ard");
+    if (!generateBtn) return;
+
+    var invalidAge = false;
+    if (ageEl && ageEl.value !== "") {
+        var age = Number(ageEl.value);
+        invalidAge = age < 18 || age > 110;
+    }
+
+    var invalidArd = false;
+    if (ardEl) {
+        invalidArd = ardEl.dataset.invalid === "true";
+        if (!invalidArd && ardEl.value !== "") {
+            invalidArd = !isArdValid(ardEl.value);
+            if (invalidArd) ardEl.dataset.invalid = "true";
+        }
+        if (ardEl.value === "") {
+            ardEl.dataset.invalid = "false";
+        }
+    }
+
+    generateBtn.disabled = invalidAge || invalidArd;
+    generateBtn.title = invalidAge ? "Age must be between 18 and 110." : invalidArd ? "ARD must be within the last year and not after today." : "";
+}
+
+function isArdValid(dateString) {
+    if (!dateString) return true;
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    var minDate = new Date(today);
+    minDate.setFullYear(minDate.getFullYear() - 1);
+
+    // Use local date parsing to avoid UTC shift
+    var current = parseLocalDate(dateString);
+    if (!current) return false;
+
+    current.setHours(0, 0, 0, 0);
+    return current >= minDate && current <= today;
+}
+
+function setDateLimits() {
+    var ardEl = document.getElementById("ard");
+    if (!ardEl) return;
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    var minDate = new Date(today);
+    minDate.setFullYear(minDate.getFullYear() - 1);
+
+    ardEl.min = formatISODate(minDate);
+    ardEl.max = formatISODate(today);
+
+    if (ardEl.value && !isArdValid(ardEl.value)) {
+        // Mark as invalid but do not clear the user's input; let validation
+        // prevent generation and preserve the entered value for review.
+        ardEl.dataset.invalid = "true";
+        showToast("ARD must be within the last year and not after today.", 3000);
+    } else {
+        ardEl.dataset.invalid = "false";
+    }
+
+    updateGenerateButtonState();
+}
+
+function validateFormValues() {
+    var ageEl = document.getElementById("age");
+    var ardEl = document.getElementById("ard");
+    var residentNameEl = document.getElementById("residentName");
+    var dpoaEl = document.getElementById("dpoa");
+
+    if (residentNameEl && residentNameEl.value.length > 30) {
+        residentNameEl.value = residentNameEl.value.slice(0, 30);
+        residentNameEl.focus();
+        showToast("Resident name must be 30 characters or less.", 3000);
+        return false;
+    }
+
+    if (dpoaEl && dpoaEl.value.length > 30) {
+        dpoaEl.value = dpoaEl.value.slice(0, 30);
+        dpoaEl.focus();
+        showToast("DPOA must be 30 characters or less.", 3000);
+        return false;
+    }
+
+    if (ageEl && ageEl.value !== "") {
+        var age = Number(ageEl.value);
+        if (age < 18 || age > 110) {
+            ageEl.focus();
+            showToast("Age must be between 18 and 110.", 3000);
+            return false;
+        }
+    }
+
+    if (ardEl && ardEl.value !== "") {
+        if (!isArdValid(ardEl.value)) {
+            ardEl.dataset.invalid = "true";
+            ardEl.focus();
+            showToast("ARD must be within the last year and not after today.", 3000);
+            updateGenerateButtonState();
+            return false;
+        }
+        ardEl.dataset.invalid = "false";
+    }
+
+    updateGenerateButtonState();
+    return true;
+}
+
 function generateNote() {
+
+    if (!validateFormValues()) {
+        return;
+    }
 
     var name = document.getElementById("residentName").value;
     var age = document.getElementById("age").value;
     var ard = document.getElementById("ard").value;
     var ardDisplay = "";
     if (ard) {
-        var ardDate = new Date(ard);
+        // Use local date parsing to avoid timezone shift (so it won't show yesterday)
+        var ardDate = parseLocalDate(ard);
         var yy = String(ardDate.getFullYear()).slice(-2); // last two digits
         ardDisplay = (ardDate.getMonth() + 1) + "/" + ardDate.getDate() + "/" + yy;
     }
@@ -482,6 +619,28 @@ document.addEventListener("DOMContentLoaded", function() {
             window.print();
         });
 
+    setDateLimits();
+
+    var ardEl = document.getElementById("ard");
+    if (ardEl) {
+        ardEl.addEventListener("change", function() {
+            setDateLimits();
+            validateFormValues();
+        });
+    }
+
+    var ageEl = document.getElementById("age");
+    if (ageEl) {
+        ageEl.addEventListener("input", function() {
+            validateFormValues();
+        });
+        ageEl.addEventListener("change", function() {
+            validateFormValues();
+        });
+    }
+
+    updateGenerateButtonState();
+
     // wire up orientation -> BIMS sync
     var orientationEl = document.getElementById("orientation");
     if (orientationEl) {
@@ -499,6 +658,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 });
+
 
 // Measure longest option text and set the BIMS select width accordingly
 function adjustBIMSWidth() {

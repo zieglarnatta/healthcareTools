@@ -1,0 +1,63 @@
+{
+  "browsers": ["chrome", "firefox", "edge"],
+  "noteType": ["Admission", "Quarterly", "Annual", "Significant Changes"],
+  "residentName": [
+    "John Doe",
+    "Jane Q Public",
+    "AReallyLongNameExceedingThirtyCharactersShouldTruncate"
+  ],
+  "dpoa": [
+    "Jane Smith",
+    "Power of Attorney With A Very Long Name Exceeding Limits"
+  ],
+  "ages": [18, 45, 70, 82, 110, 17, 120],
+  "ard": ["", "VALID_RECENT", "FUTURE", "INVALID_OLD"],
+  "orientation": [
+    "",
+    "Resident is alert and oriented x4.",
+    "Resident is alert and oriented x3.",
+    "Resident is alert and oriented x2.",
+    "Resident is alert and oriented x1.",
+    "Resident declined to participate in BIMS assessment."
+  ],
+  "bims": [
+    "",
+    "with a score of 1/15. SW proceeded to staff interviews and review of the chart.",
+    "with a score of 7/15. SW proceeded to PHQ-2 to 9 assessment.",
+    "with a score of 15/15. SW proceeded to PHQ-2 to 9 assessment.",
+    "resident declined to participate in assessment. SW proceeded to staff interviews."
+  ],
+  "phq": [
+    "",
+    "9/27, indicating mild depression.",
+    "14/27, indicating moderate depression.",
+    "20/27, indicating severe depression.",
+    "27/27, indicating severe depression."
+  ],
+  "behavior": [
+    "",
+    "Resident's behavior is stable. No physical, verbal or other behaviors noted or reported.",
+    "Occasional verbal agitation noted.",
+    "Requires staff redirection at times.",
+    "No significant behavior concerns."
+  ],
+  "careConference": [
+    "",
+    "offered and accepted.",
+    "offered and declined.",
+    "held with family present.",
+    "not conducted this quarter."
+  ],
+  "polst": [
+    "",
+    "FULL CODE / FULL TREATMENT",
+    "FULL CODE / SELECTIVE TREATMENT",
+    "DNR / FULL TREATMENT",
+    "DNR / SELECTIVE TREATMENT",
+    "DNR / COMFORT-FOCUSED TREATMENT"
+  ],
+  "meta": {
+    "happy_path_fraction": 0.05,
+    "notes": "Special tokens: 'VALID_RECENT' = a recent valid ARD date (generator will map to today - 90d); 'FUTURE' = tomorrow; 'INVALID_OLD' = older than 1 year; empty string means leave field blank."
+  }
+}
