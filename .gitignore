@@ -1,0 +1,31 @@
+# Python virtual environment and local tooling
+.venv/
+.idea/
+.vscode/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Robot Framework and generic test output
+*.log
+*.xml
+log.html
+report.html
+robotFrameworkTests/tests/generated/
+robotFrameworkTests/tests/results_full/
+
+# JavaScript / browser framework artifacts
+**/node_modules/
+**/package-lock.json
+**/playwright-report/
+**/test-results/
+**/screenshots/
+**/videos/
+**/downloads/
+
+# Local browser drivers and runtime installs
+drivers/
+
+# Local project generated output
+**/generated/
+**/results_full/
