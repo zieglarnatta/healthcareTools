@@ -1,62 +1,81 @@
 # healthcareTools
 
-A small collection of lightweight HTML + JavaScript utilities to assist with common healthcare documentation tasks. These tools are intended to speed up writing standard notes and reports by generating consistent, copyable, and printable text from a small set of inputs.
+A lightweight collection of healthcare documentation utilities built as static HTML, CSS, and JavaScript assets. The repository is intended to support faster, more consistent completion of common clinical writing tasks, especially MDS note drafting and related documentation workflows.
 
 ## Included tools
 
-- `MDS_html.html`: A web-based MDS (Minimum Data Set) note generator for common MDS note types. See details below.
+- `MDS_html.html`: a browser-based MDS note generator used to create formatted documentation based on resident demographics, assessment selections, and screening inputs.
 
-## `MDS_html.html` — what it does
+## `MDS_html.html` overview
 
-`MDS_html.html` is a single-file HTML/JS tool that generates a formatted MDS note based on user inputs. The page provides a compact form for entering resident information and clinical screening results, then generates a plain-text note you can copy, print, or clear.
+`MDS_html.html` is a static application that assembles a structured MDS note from user-entered values. It collects resident and assessment data, validates required fields, generates a final note in plain text, and then allows the user to copy, print, or clear the result.
 
-### Inputs
+### Core inputs
 
-- **Note Type**: dropdown with options such as Admission, Quarterly, Annual, Significant Changes.
-- **Resident Name**: free-text input for the resident's preferred name.
-- **Age**: numeric input for the resident's age.
-- **ARD (Assessment Reference Date)**: date input. The displayed output uses `MM/DD/YY` formatting (year shown as last two digits).
-- **DPOA**: free-text input for the decision-maker / power of attorney name.
-- **Orientation**: dropdown with prewritten cognition/orientation sentences.
-	- Special behavior: when `Orientation` is set to "Resident declined to participate in BIMS assessment.", the `BIMS` field is automatically set to the declined option and locked (see below).
-- **PHQ Result**: dropdown with PHQ scoring phrase options to describe depressive symptom severity.
-- **Behavior**: dropdown with behavior summary phrases.
-- **Care Conference**: dropdown to note whether a care conference was offered/held/declined.
-- **POLST**: dropdown for code status / POLST entries.
+- **Note Type**: selection for note category such as Admission, Quarterly, Annual, or Significant Changes.
+- **Resident Name**: resident name input, limited to a safe character set and length.
+- **Age**: age input with a valid range check.
+- **ARD**: assessment reference date input, validated against a rolling one-year window.
+- **DPOA**: decision-maker / power of attorney field.
+- **Orientation**: prewritten cognition/orientation statements.
+- **BIMS**: BIMS assessment selection used to document the resident's cognitive assessment outcome.
+- **PHQ Result**: PHQ scoring text used in mood screening documentation.
+- **Behavior**: behavior summary options.
+- **Care Conference**: care conference status selection.
+- **POLST**: code status / treatment preference selection.
 
-### Orientation ↔ BIMS behavior
+### Orientation and BIMS logic
 
-- The `Orientation` and `BIMS` fields are linked to prevent inconsistent selections.
-- If `Orientation` is exactly `Resident declined to participate in BIMS assessment.`, the `BIMS` dropdown will be auto-selected to `Resident declined to participate in assessment. SW proceeded to staff interviews.` and the `BIMS` control is temporarily disabled so users cannot change it.
-- In all other cases the specific "declined" option in the `BIMS` dropdown is disabled (not selectable) to avoid mismatched entries; if it was previously selected it will be cleared when `Orientation` changes.
-- The `BIMS` selector is rendered on its own full-width row and is auto-resized at load/resize to display the longest option without truncation.
+The `Orientation` and `BIMS` fields are intentionally linked to prevent inconsistent documentation.
 
-### How BIMS appears in the generated note
+- If the `Orientation` field is set to `Resident declined to participate in BIMS assessment.`, the `BIMS` field is automatically set to `resident declined to participate in assessment. SW proceeded to staff interviews.` and the control is temporarily locked.
+- In all other selections, the specific declined `BIMS` option is disabled so the user cannot choose a conflicting result.
+- If a user changes away from the declined `Orientation` state, any previously selected declined `BIMS` value is cleared to keep the form consistent.
+- The `BIMS` control is displayed on its own full-width row and auto-resizes to fit the longest option text without truncation.
 
-- The generated note always includes the `Orientation` sentence followed immediately by a BIMS sentence in the `COGNITION` section, for example:
+### Generated note output
 
-	Orientation text
-	SW approached <name> to complete the BIMS assessment, <BIMS selection>
-	SW will continue to monitor for any changes in cognition and adjust the care plan accordingly.
+The generated note includes the selected `Orientation` text followed by the BIMS sentence in the `COGNITION` section, for example:
+Generated Note
+```text
+Orientation text
+SW approached <name> to complete the BIMS assessment, <BIMS selection>
+SW will continue to monitor for any changes in cognition and adjust the care plan accordingly.
+```
 
-### Final output
+The final output is written into the **Generated Note** textarea, where the user can review, copy, print, or clear it.
 
-- The tool composes a multiline plain-text MDS note and places it in the **Generated Note** textarea. The textarea auto-resizes to fit the generated content.
-- The output is ready to be copied into clinical records, pasted into other documents, or printed directly from the browser.
+### Action buttons
 
-### Action buttons / functionalities
+- **Generate Note**: validates the current form, builds the note, and fills the output text area.
+- **Copy Note**: copies the generated note to the clipboard with a fallback copy method when needed.
+- **Print**: opens the browser print flow for a cleaner printout of the final note.
+- **Clear**: resets the form and clears the generated output.
 
-- **Generate Note** (`Generate Note`): Builds the note from current form values and populates the `Generated Note` textarea. Also auto-resizes the textarea to fit the content.
-- **Copy Note** (`Copy Note`): Copies the generated note text to the clipboard. If clipboard.writeText is not available, the tool falls back to a selected-copy approach. A transient on-screen toast confirms success or prompts the user to generate a note first.
-- **Print** (`Print`): Opens the browser print dialog (calls `window.print()`), providing a printable rendering of the generated note. The form controls are hidden in the print stylesheet so only the note content is printed.
-- **Clear** (`Clear`): Clears all form inputs and the generated note output.
+### Security measures built in
 
-### Location
+Several protections were added to the current implementation:
 
-The file is available at `MDS_html.html` in the repository root of this folder.
+- **Content Security Policy (CSP)**: the HTML includes a CSP meta tag that restricts script execution to the current origin, blocks remote connections, and prevents embedded content or external form actions.
+- **CSS and JavaScript separation**: the page loads its styling and logic from `static/css/styles.css` and `static/js/mds.js` instead of embedding them directly in the page, which improves maintainability and reduces inline exposure.
+- **Input validation**: the JavaScript includes `validName()` and related checks to limit name length, reject unsafe characters, and validate age and ARD values before note generation.
 
----
+## Local usage
 
-## Usage example
+The browser-based tool expects the files to remain together in the same folder structure so the relative paths resolve correctly:
 
-Open `MDS_html.html` in a browser and complete the form, or simply click **Generate Note** after entering values.
+- `MDS_html.html`
+- `static/css/styles.css`
+- `static/js/mds.js`
+
+Open `MDS_html.html` directly in a browser, or serve the folder locally with Python if you prefer a simple local host:
+
+```bash
+python3 -m http.server 8000 --directory healthcareTools >/tmp/serve.log 2>&1 & echo $!
+```
+
+Then open the page in a browser at:
+
+```text
+http://localhost:8000/MDS_html.html
+```

@@ -99,11 +99,28 @@ function validateFormValues() {
         return false;
     }
 
+    // Strict whitelist for names (client-side UX only). Server must re-validate.
+    if (residentNameEl && residentNameEl.value) {
+        if (!validName(residentNameEl.value)) {
+            residentNameEl.focus();
+            showToast("Resident name contains invalid characters.", 3000);
+            return false;
+        }
+    }
+
     if (dpoaEl && dpoaEl.value.length > 30) {
         dpoaEl.value = dpoaEl.value.slice(0, 30);
         dpoaEl.focus();
         showToast("DPOA must be 30 characters or less.", 3000);
         return false;
+    }
+
+    if (dpoaEl && dpoaEl.value) {
+        if (!validName(dpoaEl.value)) {
+            dpoaEl.focus();
+            showToast("DPOA contains invalid characters.", 3000);
+            return false;
+        }
     }
 
     if (ageEl && ageEl.value !== "") {
@@ -134,6 +151,24 @@ function sanitizeTextInput(s) {
     if (!s) return '';
     // Trim and remove control characters that could be abused in downstream systems
     return String(s).trim().replace(/[\x00-\x1F\x7F]/g, '');
+}
+
+// Validate a name-like field with a conservative whitelist.
+// Allows Unicode letters, combining marks, spaces and common name punctuation.
+function validName(s) {
+    if (!s) return false;
+    var v = String(s);
+    if (v.normalize) v = v.normalize('NFC');
+    v = v.trim();
+    try {
+        // Use Unicode-aware regex when supported
+        var re = new RegExp("^[\\p{L}\\p{M} .,'-]{1,30}$","u");
+        return re.test(v);
+    } catch (e) {
+        // Fallback for environments without \p support
+        var ascii = /^[A-Za-z .,'-]{1,30}$/;
+        return ascii.test(v);
+    }
 }
 
 function generateNote() {

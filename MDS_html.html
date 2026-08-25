@@ -3,157 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; upgrade-insecure-requests;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; upgrade-insecure-requests;">
 <title>MDS Note Generator</title>
-
-<style>
-body {
-    font-family: Segoe UI, Arial, sans-serif;
-    background: #f5f6fa;
-    margin: 20px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: auto;
-}
-
-.card {
-    background: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-h1 {
-    color: #0078d4;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    gap: 15px;
-}
-
-/* allow certain fields to span the full width of the grid */
-.grid .full-row {
-    grid-column: 1 / -1;
-}
-
-/* Title row: keep items inline and prevent wrapping */
-.title-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: nowrap;
-}
-.title-row h1 {
-    margin: 0;
-    color: #0078d4;
-    font-size: 1.75rem;
-    white-space: nowrap;
-}
-.title-row .note-generator {
-    font-size: 1.75rem;
-    color: #0078d4;
-    font-weight: 600;
-    white-space: nowrap;
-}
-.title-row select#noteType {
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background: white;
-    width: auto; /* don't stretch to full width */
-    min-width: max-content; /* fit longest option */
-    white-space: nowrap;
-}
-
-/* Toast notifications */
-.toast {
-    background: rgba(0,0,0,0.85);
-    color: #fff;
-    padding: 10px 14px;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    margin-top: 8px;
-    opacity: 1;
-    transition: opacity 300ms ease, transform 300ms ease;
-}
-.toast.hide { opacity: 0; transform: translateY(8px); }
-
-/* Centered toast container */
-#toastContainer {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none; /* allow clicks through except on toast */
-}
-#toastContainer .toast {
-    pointer-events: auto; /* to allow interactions with the toast itself */
-    min-width: 220px;
-    text-align: center;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-input, select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.buttons {
-    margin-top: 20px;
-}
-
-button {
-    padding: 10px 16px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    color: white;
-}
-
-#generateBtn { background: #0078d4; }
-#copyBtn { background: #107c10; }
-#clearBtn { background: #d83b01; }
-#printBtn { background: #5c2d91; }
-
-textarea {
-    width: 100%;
-    min-height: 200px; /* default minimum */
-    height: auto; /* allow JS to resize */
-    border: 1px solid #ccc;
-    padding: 10px;
-    font-family: Consolas, monospace;
-    box-sizing: border-box;
-    overflow: hidden; /* hide internal scrollbars when resized */
-}
-
-@media print {
-    .buttons,
-    .card:first-of-type {
-        display: none;
-    }
-}
-</style>
+<link rel="stylesheet" href="static/css/styles.css">
 </head>
-<body>
 
 <div class="container">
 
@@ -175,22 +28,22 @@ textarea {
 
 <div>
 <label>Resident Name</label>
-<input type="text" id="residentName" maxlength="30">
+<input type="text" id="residentName" maxlength="30" autocomplete="off" spellcheck="false">
 </div>
 
 <div>
 <label>Age</label>
-<input type="number" id="age" min="18" max="110" step="1">
+<input type="number" id="age" min="18" max="110" step="1" autocomplete="off" spellcheck="false">
 </div>
 
 <div>
 <label>ARD</label>
-<input type="date" id="ard">
+<input type="date" id="ard" autocomplete="off" spellcheck="false">
 </div>
 
 <div>
 <label>DPOA</label>
-<input type="text" id="dpoa" maxlength="30">
+<input type="text" id="dpoa" maxlength="30" autocomplete="off" spellcheck="false">
 </div>
 
 <div>
