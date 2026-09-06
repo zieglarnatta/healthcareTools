@@ -8,10 +8,10 @@ Suite Teardown    Teardown Suite
 Test Teardown    Capture Failure Screenshot
 
 *** Variables ***
-${HTML}    file://${CURDIR}/../../MDS_html.html
+${HTML}    file://${CURDIR}/../../MDS_activity_note.html
 @{BROWSERS}    chrome    firefox    edge
 ${SCREEN_DIR}    ${CURDIR}/../../screenshots
-${GECKO_PROC}    
+${GECKO_PROC}
 
 *** Test Cases ***
 Age, Name, and Calendar Field Limits - Chrome
@@ -158,7 +158,7 @@ Generate Note - Chrome
     Open Browser Headless    chrome
     Fill Form And Generate Note
     Verify Generated Note
-    Capture Full Page Screenshot    ${SCREEN_DIR}/chrome_success.png
+    Capture Full Page Screenshot    ${SCREEN_DIR}/chrome_activities_success.png
     Close Browser
 
 Generate Note - Firefox
@@ -166,7 +166,7 @@ Generate Note - Firefox
     Open Browser Headless    firefox
     Fill Form And Generate Note
     Verify Generated Note
-    Capture Full Page Screenshot    ${SCREEN_DIR}/firefox_success.png
+    Capture Full Page Screenshot    ${SCREEN_DIR}/firefox_activities_success.png
     Close Browser
 
 Generate Note - Edge
@@ -174,12 +174,12 @@ Generate Note - Edge
     Open Browser Headless    edge
     Fill Form And Generate Note
     Verify Generated Note
-    Capture Full Page Screenshot    ${SCREEN_DIR}/edge_success.png
+    Capture Full Page Screenshot    ${SCREEN_DIR}/edge_activities_success.png
     Close Browser
 
 *** Keywords ***
 Prepare Suite
-    File Should Exist    ${CURDIR}/../../MDS_html.html
+    File Should Exist    ${CURDIR}/../../MDS_activity_note.html
     Create Directory    ${SCREEN_DIR}
     ${http_proc}=    Start Process    /bin/bash    -c    cd /home/zieglarnatt/Workspace/healthcareTools && python3 -m http.server 8000    stdout=PIPE    stderr=STDOUT    shell=False
     Set Suite Variable    ${HTTP_PROC}    ${http_proc}
@@ -293,7 +293,7 @@ Fill Form And Generate Note
 
 Verify Generated Note
     ${note}=    Get Value    id=output
-    Should Contain    ${note}    MDS Admission NOTE
+    Should Contain    ${note}    Activities NOTE
     Should Contain    ${note}    Resident prefers to be called John Doe
     Should Contain    ${note}    82 years old
     Should Contain    ${note}    ARD:

@@ -5,6 +5,7 @@ A lightweight collection of healthcare documentation utilities built as static H
 ## Included tools
 
 - `MDS_html.html`: a browser-based MDS note generator used to create formatted documentation based on resident demographics, assessment selections, and screening inputs.
+- `MDS_activity_note.html`: an activities-focused generator page for creating activity write-ups; open at `/MDS_activity_note.html` in a browser.
 
 ## `MDS_html.html` overview
 
@@ -68,10 +69,18 @@ The browser-based tool expects the files to remain together in the same folder s
 - `static/css/styles.css`
 - `static/js/mds.js`
 
-Open `MDS_html.html` directly in a browser, or serve the folder locally with Python if you prefer a simple local host:
+Open `MDS_html.html` directly in a browser, or use the provided helper script to start a local Python HTTP server and run Robot tests.
+
+Start the server (serves the repository root by default):
 
 ```bash
-python3 -m http.server 8000 --directory healthcareTools >/tmp/serve.log 2>&1 & echo $!
+./scripts/start_http_server.sh
+```
+
+Or specify port/host/webroot:
+
+```bash
+./scripts/start_http_server.sh 8000 127.0.0.1 /path/to/webroot
 ```
 
 Then open the page in a browser at:
@@ -79,3 +88,139 @@ Then open the page in a browser at:
 ```text
 http://localhost:8000/MDS_html.html
 ```
+
+## `MDS_activity_note.html` overview
+
+`MDS_activity_note.html` is a focused activities write-up generator implemented as a static HTML application. It assembles an activity-focused note from simple form inputs and provides quick copy/print actions for clinical documentation workflows.
+
+Core inputs and controls
+
+- ARD (assessment/reference date)
+- Resident Name and Age
+- Cognition (orientation selections)
+- Communication and Limited (special needs flags such as HOH, ESL, Dementia)
+- Misc (activity preference/status)
+- Action buttons: Generate, Copy note, Print, Clear
+
+Output
+
+- A rendered "Generated Write-up" panel shows the assembled note.
+- A collapsible "All inputs (raw)" view exposes the JSON/plain-text inputs for inspection or test assertions.
+
+Implementation notes
+
+- Loads styling from `static/css/activities.css` and logic from `static/js/activities.js`.
+- Includes a restrictive Content Security Policy meta tag to limit external resources and script execution.
+- Designed for direct opening in a browser at `/MDS_activity_note.html` or served via the local HTTP server used by tests.
+
+
+Running Robot tests (recommended workflow):
+
+1. Start the HTTP server (above).
+2. Install drivers and create the venv:
+
+```bash
+python3 tools/install_drivers.py
+```
+
+3. Run the tests with the project's venv python:
+
+```bash
+.venv/bin/python -m robot robotFrameworkTests/tests/mDS.robot
+.venv/bin/python -m robot robotFrameworkTests/tests/activities.robot
+```
+
+Test artifacts are written to output.xml, log.html, and report.html in the repository root.
+
+## Testing with Cypress and Playwright
+
+Below are step-by-step instructions to run end-to-end tests for the MDS tools.
+
+### Common prerequisite
+
+- Ensure the app is being served from the repository root, typically at http://localhost:8000. You can start a simple server from the repo root with:
+
+```bash
+python3 -m http.server 8000
+```
+
+### Cypress (cypressTest)
+
+Quick run (recommended wrapper):
+
+1. From the repo root make the wrapper executable and run it:
+
+```bash
+chmod +x cypressTest/start-cypress.sh
+./cypressTest/start-cypress.sh
+```
+
+- The wrapper checks `http://localhost:8000/MDS_activity_note.html` and `http://localhost:8000/MDS_html.html`, starts a minimal Python HTTP server if needed, then runs Cypress with baseUrl pointing at the server.
+
+Manual steps:
+
+1. Start the server (if not using the wrapper):
+
+```bash
+python3 -m http.server 8000
+```
+
+2. Install dependencies:
+
+```bash
+cd cypressTest
+npm install
+```
+
+3. Run headless tests:
+
+```bash
+npx cypress run --config baseUrl=http://localhost:8000
+```
+
+4. Open Cypress interactively:
+
+```bash
+npx cypress open
+```
+
+Options:
+
+- Run a single spec with the wrapper:
+
+```bash
+SPEC="cypress/e2e/activity_note_smoke.cy.js" ./cypressTest/start-cypress.sh
+```
+
+- Use a different port:
+
+```bash
+PORT=8080 ./cypressTest/start-cypress.sh
+# or pass --config baseUrl=http://localhost:PORT to npx cypress run
+```
+
+Generating pairwise fixture (optional):
+
+```bash
+cd cypressTest
+node scripts/generate_pairwise_fixture.js
+npx cypress run --spec "cypress/e2e/pairwise.cy.js" --config baseUrl=http://localhost:8000
+```
+
+### Playwright (playwrightTest)
+
+Quick run:
+
+```bash
+cd playwrightTest
+npm install
+npx playwright install
+npm test
+```
+
+Notes:
+
+- If Playwright tests need the app, start the HTTP server at http://localhost:8000 before running tests.
+- To avoid repeated browser downloads in CI, preinstall Playwright browsers or set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 when appropriate.
+
+If any step fails, copy the failing command output and open an issue or ask for help with the exact error message.

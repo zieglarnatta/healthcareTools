@@ -1,0 +1,10 @@
+[
+  { "name": "activity_case_01", "noteType": "NOTE", "residentName": "John Doe", "age": "82", "ard": "" , "cognition": "Alert & oriented x4", "communication": "Able to communicate verbally", "limited": "HOH", "misc": "Activity preferences have not changed"},
+  { "name": "activity_case_02", "noteType": "QUATERLY", "residentName": "Jane Doe", "age": "17", "ard": "" , "cognition": "Alert & oriented x3", "communication": "Able to convey needs but has trouble with complex instruction(s)", "limited": "Dementia", "misc": "Activity interest has declined"},
+  { "name": "activity_case_03", "noteType": "ANNUAL", "residentName": "Alice A.", "age": "120", "ard": "" , "cognition": "Alert & oriented x2", "communication": "Unable to communicate verbally", "limited": "Other", "misc": "Activity preferences have not changed"},
+  { "name": "activity_case_04", "noteType": "NOTE", "residentName": "Bob B.", "age": "45", "ard": "2026-09-01" , "cognition": "Alert & oriented x1", "communication": "Able to communicate verbally", "limited": "ESL", "misc": "Activity interest has declined"},
+  { "name": "activity_case_05", "noteType": "", "residentName": "", "age": "", "ard": "", "cognition": "", "communication": "", "limited": "", "misc": ""},
+  { "name": "activity_case_06", "noteType": "NOTE", "residentName": "Carl C.", "age": "18", "ard": "2026-09-06" , "cognition": "Alert & oriented x4", "communication": "Able to communicate verbally", "limited": "Dysphasia", "misc": "Activity preferences have not changed"},
+  { "name": "activity_case_07", "noteType": "QUATERLY", "residentName": "Dana D.", "age": "30", "ard": "2026-06-01" , "cognition": "Alert & oriented x3", "communication": "Able to convey needs but has trouble with complex instruction(s)", "limited": "HOH", "misc": "Activity interest has declined"},
+  { "name": "activity_case_08", "noteType": "ANNUAL", "residentName": "Eve E.", "age": "90", "ard": "2026-12-01" , "cognition": "Alert & oriented x2", "communication": "Unable to communicate verbally", "limited": "Dementia", "misc": "Activity preferences have not changed"}
+]
