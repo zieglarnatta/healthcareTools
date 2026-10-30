@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; upgrade-insecure-requests;">
+  <title>MDS: Activities Generator</title>
+  <link rel="stylesheet" href="static/css/activities.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="title-row">
+        <h1 class="title">MDS ACTIVITIES</h1>
+        <div class="top-controls">
+          <select id="noteType" aria-label="Note type">
+            <option></option>
+            <option>NOTE</option>
+            <option>QUATERLY</option>
+            <option>ANNUAL</option>
+          </select>
+          <div class="note-generator">Generator</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="form">
+      <div class="row">
+        <label for="ard">ARD</label>
+        <input type="date" id="ard" />
+      </div>
+
+      <div class="row">
+        <label for="residentName">Name</label>
+        <input type="text" id="residentName" maxlength="30" autocomplete="off" spellcheck="false" placeholder="Resident name">
+      </div>
+
+      <div class="row">
+        <label for="age">Age</label>
+        <input type="number" id="age" min="18" max="110" step="1" autocomplete="off" spellcheck="false" placeholder="18">
+      </div>
+
+      <div class="row">
+        <label for="cognition">Cognition</label>
+        <select id="cognition">
+          <option value="">-- select --</option>
+          <option>Alert & oriented x1</option>
+          <option>Alert & oriented x2</option>
+          <option>Alert & oriented x3</option>
+          <option>Alert & oriented x4</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="communication">Communication</label>
+        <select id="communication">
+          <option value="">-- select --</option>
+          <option>Able to communicate verbally</option>
+          <option>Able to convey needs but has trouble with complex instruction(s)</option>
+          <option>Unable to communicate verbally</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="limited">Limited</label>
+        <select id="limited">
+          <option value="">-- select --</option>
+          <option>HOH</option>
+          <option>ESL</option>
+          <option>Dementia</option>
+          <option>Dysphasia</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="misc">Misc</label>
+        <select id="misc">
+          <option value="">-- select --</option>
+          <option>Activity preferences have not changed</option>
+          <option>Activity interest has declined</option>
+        </select>
+      </div>
+
+      <div class="buttons">
+        <button id="generateBtn" type="button">Generate</button>
+        <button id="copyBtn" type="button">Copy note</button>
+        <button id="printBtn" type="button">Print</button>
+        <button id="clearBtn" type="button">Clear</button>
+      </div>
+    </section>
+
+    <section class="output-area">
+      <h2>Generated Write-up</h2>
+      <div id="output" class="output"></div>
+
+      <details class="raw-details">
+        <summary>All inputs (raw)</summary>
+        <pre id="rawOutput" class="rawOutput"></pre>
+      </details>
+    </section>
+  </main>
+
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <script src="static/js/activities.js" defer></script>
+</body>
+</html>

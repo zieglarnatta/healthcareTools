@@ -181,6 +181,8 @@ Generate Note - Edge
 Prepare Suite
     File Should Exist    ${CURDIR}/../../MDS_html.html
     Create Directory    ${SCREEN_DIR}
+    ${http_proc}=    Start Process    /bin/bash    -c    cd /home/zieglarnatt/Workspace/healthcareTools && python3 -m http.server 8000    stdout=PIPE    stderr=STDOUT    shell=False
+    Set Suite Variable    ${HTTP_PROC}    ${http_proc}
     Log Driver Versions
 
 Log Driver Versions
@@ -221,6 +223,7 @@ Log Driver Versions
 
 Teardown Suite
     Close All Browsers
+    Run Keyword And Ignore Error    Terminate Process    ${HTTP_PROC}
     Run Keyword And Ignore Error    Terminate Process    ${GECKO_PROC}
 
 Open Browser Headless
